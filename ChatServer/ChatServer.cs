@@ -47,17 +47,27 @@ public partial class ChatServer
             {
                 var message = connection.ReadLine( );
 
-                connection.SendMessage(message);
+                connection.Send(message);
+                BroadcastMessage(message, connection);
             }
         }
         catch ( Exception )
         {
             // do anything necessary to handle a disconnected client in here
+
         }
     }
 
-    public static void SendMessage(this NetworkConnection connection, string message)
+    public static void BroadcastMessage(string message, NetworkConnection connection)
     {
         connection.Send(clients[connection] + " : " +message);
+
+        foreach (var ClientConnection in clients.Keys )
+        {
+            if (ClientConnection != connection)
+            {
+                ClientConnection.Send(clients[connection] + " : " + message);
+            }
+        }
     }
 }

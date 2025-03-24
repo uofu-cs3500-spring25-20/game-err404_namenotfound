@@ -41,13 +41,12 @@ public partial class ChatServer
         {
             string ClientName = connection.ReadLine();
             clients.Add(connection, ClientName);
-
+            connection.Send("Welcome to the chat server, " + ClientName + "!");
 
             while ( true )
             {
                 var message = connection.ReadLine( );
 
-                connection.Send(message);
                 BroadcastMessage(message, connection);
             }
         }
@@ -60,14 +59,12 @@ public partial class ChatServer
 
     public static void BroadcastMessage(string message, NetworkConnection connection)
     {
-        connection.Send(clients[connection] + " : " +message);
 
         foreach (var ClientConnection in clients.Keys )
         {
-            if (ClientConnection != connection)
-            {
-                ClientConnection.Send(clients[connection] + " : " + message);
-            }
+            
+             ClientConnection.Send(clients[connection] + " : " + message);
+        
         }
     }
 }

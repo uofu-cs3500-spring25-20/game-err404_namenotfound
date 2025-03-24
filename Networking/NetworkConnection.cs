@@ -179,4 +179,9 @@ public sealed class NetworkConnection : IDisposable
     {
         Disconnect();
     }
+
+    /// <summary>   
+    /// 
+    /// </summary>
+    /// 
 }

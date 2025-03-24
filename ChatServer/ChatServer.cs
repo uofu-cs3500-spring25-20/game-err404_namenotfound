@@ -13,6 +13,8 @@ namespace CS3500.Chatting;
 public partial class ChatServer
 {
 
+    private static Dictionary<NetworkConnection, string> clients = new Dictionary<NetworkConnection, string>();
+
     /// <summary>
     ///   The main program.
     /// </summary>
@@ -37,16 +39,25 @@ public partial class ChatServer
         // handle all messages until disconnect.
         try
         {
+            string ClientName = connection.ReadLine();
+            clients.Add(connection, ClientName);
+
+
             while ( true )
             {
                 var message = connection.ReadLine( );
 
-                connection.Send( "thanks!" );
+                connection.SendMessage(message);
             }
         }
         catch ( Exception )
         {
             // do anything necessary to handle a disconnected client in here
         }
+    }
+
+    public static void SendMessage(this NetworkConnection connection, string message)
+    {
+        connection.Send(clients[connection] + " : " +message);
     }
 }

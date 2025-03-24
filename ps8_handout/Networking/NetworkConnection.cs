@@ -66,7 +66,13 @@ public sealed class NetworkConnection : IDisposable
         get
         {
             // TODO: implement this
-            throw new NotImplementedException();
+            if (_tcpClient == null)
+            {
+                return false;
+            }
+
+            return _tcpClient.Connected;
+
         }
     }
 
@@ -76,10 +82,19 @@ public sealed class NetworkConnection : IDisposable
     /// </summary>
     /// <param name="host"> The URL or IP address, e.g., www.cs.utah.edu, or  127.0.0.1. </param>
     /// <param name="port"> The port, e.g., 11000. </param>
-    public void Connect( string host, int port )
+    public void Connect( string host, int port)
     {
         // TODO: implement this
-        throw new NotImplementedException();
+        if (IsConnected)
+        {
+            throw new InvalidOperationException("Already connected");
+        }
+
+        _tcpClient.Connect(host, port);
+
+        _reader = new StreamReader(_tcpClient.GetStream(), Encoding.UTF8);
+        _writer = new StreamWriter(_tcpClient.GetStream(), Encoding.UTF8) { AutoFlush = true };
+
     }
 
 
@@ -95,7 +110,17 @@ public sealed class NetworkConnection : IDisposable
     public void Send( string message )
     {
         // TODO: Implement this
-        throw new NotImplementedException();
+        if (!IsConnected)
+        {
+            throw new InvalidOperationException("Not connected");
+        }
+        if (_writer == null)
+        {
+            throw new InvalidOperationException("Writer is null");
+        }
+
+        _writer.WriteLine(message);
+
     }
 
 
@@ -109,7 +134,22 @@ public sealed class NetworkConnection : IDisposable
     public string ReadLine( )
     {
         // TODO: implement this
-        throw new NotImplementedException();
+
+        if (!IsConnected)
+        {
+            throw new InvalidOperationException("Not connected");
+        }
+        if (_reader == null)
+        {
+            throw new InvalidOperationException("Reader is null");
+        }
+        string? line = _reader.ReadLine();
+        if (line == null)
+        {
+            throw new InvalidOperationException("Reader is null");
+        }
+        
+        return line;
 
     }
 
@@ -120,7 +160,16 @@ public sealed class NetworkConnection : IDisposable
     public void Disconnect( )
     {
         //TODO: implement this
-        throw new NotImplementedException();
+        if (IsConnected)
+        {
+            _tcpClient.Close();
+            _reader?.Dispose();
+            _writer?.Dispose();
+
+            _reader = null;
+            _writer = null;
+            _tcpClient = new TcpClient();
+        }
     }
 
     /// <summary>

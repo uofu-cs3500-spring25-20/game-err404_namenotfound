@@ -65,7 +65,6 @@ public sealed class NetworkConnection : IDisposable
     {
         get
         {
-            // TODO: implement this
             if (_tcpClient == null)
             {
                 return false;
@@ -84,7 +83,6 @@ public sealed class NetworkConnection : IDisposable
     /// <param name="port"> The port, e.g., 11000. </param>
     public void Connect( string host, int port)
     {
-        // TODO: implement this
         if (IsConnected)
         {
             throw new InvalidOperationException("Already connected");
@@ -109,7 +107,6 @@ public sealed class NetworkConnection : IDisposable
     /// <param name="message"> The string of characters to send. </param>
     public void Send( string message )
     {
-        // TODO: Implement this
         if (!IsConnected)
         {
             throw new InvalidOperationException("Not connected");
@@ -133,7 +130,6 @@ public sealed class NetworkConnection : IDisposable
     /// <returns> The contents of the message. </returns>
     public string ReadLine( )
     {
-        // TODO: implement this
 
         if (!IsConnected)
         {
@@ -159,7 +155,7 @@ public sealed class NetworkConnection : IDisposable
     /// </summary>
     public void Disconnect( )
     {
-        //TODO: implement this
+        
         if (IsConnected)
         {
             _tcpClient.Close();

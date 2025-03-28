@@ -3,6 +3,7 @@
 // </copyright>
 
 using CS3500.Networking;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace CS3500.Chatting;
@@ -13,7 +14,7 @@ namespace CS3500.Chatting;
 public partial class ChatServer
 {
 
-    private static Dictionary<NetworkConnection, string> clients = new Dictionary<NetworkConnection, string>();
+    private static ConcurrentDictionary<NetworkConnection, string> clients = new ConcurrentDictionary<NetworkConnection, string>();
 
     /// <summary>
     ///   The main program.
@@ -40,7 +41,7 @@ public partial class ChatServer
         try
         {
             string ClientName = connection.ReadLine();
-            clients.Add(connection, ClientName);
+            clients.TryAdd(connection, ClientName);
             connection.Send("Welcome to the chat server, " + ClientName + "!");
 
             while ( true )
@@ -53,18 +54,26 @@ public partial class ChatServer
         catch ( Exception )
         {
             // do anything necessary to handle a disconnected client in here
-
+            clients.TryRemove(connection, out _);
         }
     }
 
+    /// <summary>
+    /// Broadcasts the message to each of the clients currently connected to the server.
+    /// </summary>
+    /// <param name="message">Message you want to send</param>
+    /// <param name="connection">Sending connection</param>
     public static void BroadcastMessage(string message, NetworkConnection connection)
     {
 
-        foreach (var ClientConnection in clients.Keys )
+        var clientConnections = clients.Keys.ToList();
+
+        foreach (var ClientConnection in clientConnections)
         {
-            
-             ClientConnection.Send(clients[connection] + " : " + message);
-        
+            if (clients.TryGetValue(connection, out string? clientName))
+            {
+                ClientConnection.Send(clientName + " : " + message);
+            }
         }
     }
 }
